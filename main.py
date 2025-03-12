@@ -24,6 +24,11 @@ from mast3r_slam.tracker import FrameTracker
 from mast3r_slam.visualization import WindowMsg, run_visualization
 import torch.multiprocessing as mp
 
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"]=""
+
+
 
 def relocalization(frame, keyframes, factor_graph, retrieval_database):
     # we are adding and then removing from the keyframe, so we need to be careful.
@@ -146,7 +151,8 @@ if __name__ == "__main__":
     mp.set_start_method("spawn")
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.set_grad_enabled(False)
-    device = "cuda:0"
+    # device = "cuda:0"
+    device = "cpu"
     save_frames = False
     datetime_now = str(datetime.datetime.now()).replace(" ", "_")
 
@@ -183,7 +189,7 @@ if __name__ == "__main__":
             intrinsics["calibration"],
         )
 
-    keyframes = SharedKeyframes(manager, h, w)
+    keyframes = SharedKeyframes(manager, h, w, 64)
     states = SharedStates(manager, h, w)
 
     if not args.no_viz:

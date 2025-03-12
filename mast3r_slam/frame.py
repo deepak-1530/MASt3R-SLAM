@@ -6,6 +6,9 @@ import torch
 from mast3r_slam.mast3r_utils import resize_img
 from mast3r_slam.config import config
 
+import os
+
+os.environ["CUDA_VISIBLE_DEVICES"]=""
 
 class Mode(Enum):
     INIT = 0
@@ -108,7 +111,7 @@ class Frame:
         return self.C / self.N if self.C is not None else None
 
 
-def create_frame(i, img, T_WC, img_size=512, device="cuda:0"):
+def create_frame(i, img, T_WC, img_size=512, device="cpu"): #device="cuda:0"):
     img = resize_img(img, img_size)
     rgb = img["img"].to(device=device)
     img_shape = torch.tensor(img["true_shape"], device=device)
@@ -123,7 +126,7 @@ def create_frame(i, img, T_WC, img_size=512, device="cuda:0"):
 
 
 class SharedStates:
-    def __init__(self, manager, h, w, dtype=torch.float32, device="cuda"):
+    def __init__(self, manager, h, w, dtype=torch.float32, device="cpu"): #"cuda"):
         self.h, self.w = h, w
         self.dtype = dtype
         self.device = device
@@ -218,7 +221,7 @@ class SharedStates:
 
 
 class SharedKeyframes:
-    def __init__(self, manager, h, w, buffer=512, dtype=torch.float32, device="cuda"):
+    def __init__(self, manager, h, w, buffer=512, dtype=torch.float32, device="cpu"): # device="cuda"):
         self.lock = manager.RLock()
         self.n_size = manager.Value("i", 0)
 
